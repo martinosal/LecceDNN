@@ -2,7 +2,7 @@
 # using deprecated uproot3 instead of uproot, as we are not needing high performance from this package, just using it to convert the data
 # please neglect warning messages caused by uproot3
 
-import uproot3
+import uproot
 import configparser
 import ast
 from Functions import checkCreateDir
