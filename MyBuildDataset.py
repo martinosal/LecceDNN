@@ -66,6 +66,7 @@ for i in inputFiles:
     missing_var=np.array([])
     if str(i+'_DF.pkl') not in os.listdir(dfPath):
         print(str(i+'_DF.pkl'),'not in ', dfPath)
+        counter+=1  ########################################################### Sei d'accordo? Altrimenti nel loop successivo prenderebbe il nuovo input associandogli però il vecchio dataType
         continue
     print(i)
     inFile = dfPath + i + '_DF.pkl'
@@ -92,32 +93,39 @@ for i in inputFiles:
 
     if PreselectionCuts != '':
         newDf = newDf.query(PreselectionCuts)
-    if analysis == 'merged':
-        selection = 'Pass_MergHP_GGF_ZZ_Tag_SR == True or Pass_MergHP_GGF_ZZ_Untag_SR == True or Pass_MergLP_GGF_ZZ_Tag_SR == True or Pass_MergLP_GGF_ZZ_Untag_SR == True or Pass_MergHP_GGF_ZZ_Tag_ZCR == True or Pass_MergHP_GGF_ZZ_Untag_ZCR == True or Pass_MergLP_GGF_ZZ_Tag_ZCR == True or Pass_MergLP_GGF_ZZ_Untag_ZCR == True'
-        newDf = newDf.query(selection)
-    elif analysis == 'resolved':
-        selection = 'Pass_MergHP_GGF_ZZ_Tag_SR == False and Pass_MergHP_GGF_ZZ_Untag_SR == False and Pass_MergLP_GGF_ZZ_Tag_SR == False and Pass_MergLP_GGF_ZZ_Untag_SR == False and Pass_MergHP_GGF_ZZ_Tag_ZCR == False and Pass_MergHP_GGF_ZZ_Untag_ZCR == False and Pass_MergLP_GGF_ZZ_Tag_ZCR == False and Pass_MergLP_GGF_ZZ_Untag_ZCR == False'
-        newDf = newDf.query(selection)
     if channel == 'ggF':
         newDf = newDf.query('Pass_isVBF == False')
+        if analysis == 'merged':
+            selection = 'Pass_MergHP_GGF_ZZ_Tag_SR == True or Pass_MergHP_GGF_ZZ_Untag_SR == True or Pass_MergHP_GGF_WZ_SR == True or Pass_MergLP_GGF_ZZ_Tag_SR == True or Pass_MergLP_GGF_ZZ_Untag_SR == True or Pass_MergHP_GGF_ZZ_Tag_ZCR == True or Pass_MergHP_GGF_WZ_ZCR == True or Pass_MergHP_GGF_ZZ_Untag_ZCR == True or Pass_MergLP_GGF_ZZ_Tag_ZCR == True or Pass_MergLP_GGF_ZZ_Untag_ZCR == True or Pass_MergLP_GGF_WZ_SR == True or Pass_MergLP_GGF_WZ_ZCR == True'
+        elif analysis == 'resolved':
+            selection = 'Pass_Res_GGF_WZ_SR == True or Pass_Res_GGF_WZ_ZCR == True or Pass_Res_GGF_ZZ_Tag_SR == True or Pass_Res_GGF_ZZ_Untag_SR == True or Pass_Res_GGF_ZZ_Tag_ZCR == True or Pass_Res_GGF_ZZ_Untag_ZCR == True'
+        newDf = newDf.query(selection)
     elif channel == 'VBF':
-        newDf = newDf.query('Pass_isVBF == True')
+        newDf = newDf.query('Pass_isVBF == True')        
+        if analysis == 'merged':
+            selection = 'Pass_MergHP_VBF_WZ_SR == True or Pass_MergHP_VBF_ZZ_SR == True or Pass_MergHP_VBF_WZ_ZCR == True or Pass_MergHP_VBF_ZZ_ZCR == True or Pass_MergLP_VBF_WZ_SR == True or Pass_MergLP_VBF_ZZ_SR == True or Pass_MergLP_VBF_WZ_ZCR == True or Pass_MergLP_VBF_ZZ_ZCR == True' 
+        elif analysis == 'resolved':
+            selection = 'Pass_Res_VBF_WZ_SR == True or Pass_Res_VBF_WZ_ZCR == True or Pass_Res_VBF_ZZ_SR == True or Pass_Res_VBF_ZZ_ZCR'
+        newDf = newDf.query(selection)
+    newDf.insert(len(newDf.columns), 'mass', np.zeros(newDf.shape[0]), True)
     if (dataType[counter] == 'sig'):
-        newDf.insert(len(newDf.columns), "isSignal", np.ones(newDf.shape[0]), True)
+        newDf.insert(len(newDf.columns), 'isSignal', np.ones(newDf.shape[0]), True)
         for k in range(newDf.shape[0]):
             found = False
             for j in range(len(DSID)):
-                if (newDf.iat[k,0] == int(DSID[j])):
-                    newDf.iat[k,0] = int(mass[j])
+                if (newDf.iat[k, 0] == int(DSID[j])): ###Vorrei rendere questo indipendente dalla posizione della colonna, ho letto che posso farlo con newDf.at[k,'DSID'] però il codice diventa molto più lento, hai un'altra soluzione? 
+                    newDf.iat[k, newDf.shape[1] - 2] = int(mass[j])
                     found = True
-#            if (found == False):
-#                print(format(Fore.RED + 'WARNING !!! missing mass value for DSID ' + str(newDf.iat[k,0])))
+            if (found == False):
+                print(format(Fore.RED + 'WARNING !!! missing mass value for DSID ' + str(newDf.iat[k,0]))) ###Succede per tutti i segnali (o quasi)tranne il primo 
+        print(newDf[0:5])
     else:
-        newDf.insert(len(newDf.columns), "isSignal", np.zeros(newDf.shape[0]), True)
+        newDf.insert(len(newDf.columns), 'isSignal', np.zeros(newDf.shape[0]), True)
         ### Assigning to background events a random signal mass
         for event in range(newDf.shape[0]):
-            newDf.iat[event,0] = random.choice(mass)
-#        print(newDf[0:20])
+            randomMass = random.choice(mass)
+            newDf.iat[event, newDf.shape[1] - 2] = int(randomMass)
+        print(newDf[0:5])
     df.append(newDf)
     counter+=1
 
