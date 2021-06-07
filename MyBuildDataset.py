@@ -135,3 +135,11 @@ logFile.close()
 ### Saving pkl files
 df_pd.to_pickle(dfPath + 'MixData_PD_' + analysis + '_' + channel + '.pkl')
 print('Saved to ' + dfPath + 'MixData_PD_' + analysis + '_' + channel + '.pkl')
+
+cut=[var+str('!=-99 and') for var in dataVariables ]
+flatten_cut=' '.join(cut)
+flatten_cut=flatten_cut[:(len(flatten_cut)-4)]
+
+df_pd_cut=df_pd.query(flatten_cut)
+
+df_pd_cut.to_pickle(dfPath + 'MixData_PD_' + analysis + '_' + channel + 'cut.pkl')
