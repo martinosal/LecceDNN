@@ -50,14 +50,13 @@ files=os.listdir(dfPath)
 dataVariables=ast.literal_eval(config.get('config', 'InputFeaturesResolved'))
 
 
-
 path='./plots/'
 directory=analysis+'_'+channel+''+PreselectionCuts
 mkplots.check_dir(path,directory)
 
 
-mixed_data=pd.read_pickle(dfPath+'MixData_PD_'+analysis+'_'+channel+'.pkl')
-pd_name='MixData_PD_'+analysis+'_'+channel
+mixed_data=pd.read_pickle(dfPath+'MixData_PD_'+analysis+'_'+channel+'_p4.pkl')
+pd_name='MixData_PD_'+analysis+'_'+channel+'_p4'
 
 print(dataVariables)
 

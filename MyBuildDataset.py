@@ -116,20 +116,27 @@ for i in inputFiles:
     if (dataType[counter] == 'sig'):
         newDf.insert(len(newDf.columns), 'isSignal', np.ones(newDf.shape[0]), True)
 
-        k=0
-        print('searching for', newDf.iat[k,0],'DSID')
-        found = False
-        for j in range(len(DSID)):
-            if (newDf.iat[k, 0] == int(DSID[j])): ###Vorrei rendere questo indipendente dalla posizione della colonna, ho letto che posso farlo con newDf.at[k,'DSID'] però il codice diventa molto più lento, hai un'altra soluzione? 
-                found = True
-                print('found mass:',int(mass[j]))
-                newDf.insert(len(newDf.columns), 'mass', np.array([int(mass[j]) for l in range(newDf.shape[0])]), True)
-                continue
+        masses=np.zeros(len(newDf['DSID']))
+        DSID_values=set(newDf['DSID'])
+        print('DSID values:',DSID_values)
+        for x in DSID_values:
+            found = False
+            print('searching for ', x,' DSID')
+            for j in range(len(DSID)):
+                if (x == int(DSID[j])):
+                    found=True
+                    print('found mass:',int(mass[j]))
+                    masses[np.where(newDf['DSID']==x)]=mass[j]
+                    #masses=np.append(masses,int(DSID[j]))
+                    continue
+            if found==False:
+                print('mass related to',x,'not found')
+                #masses=np.append(masses,0)
+                masses[np.where(newDf['DSID']==x)]=0
 
-        if (found == False):
-            newDf.insert(len(newDf.columns), 'mass', np.zeros(newDf.shape[0]), True)
-            print(format(Fore.RED + 'WARNING !!! missing mass value for DSID ' + str(newDf.iat[k,0]))) ###Succede per tutti i segnali (o quasi)tranne il primo 
-    
+        print('found masses:',set(masses))
+        newDf.insert(len(newDf.columns), 'mass', masses, True)
+
     print(newDf[0:5])
     df.append(newDf)
     counter+=1
