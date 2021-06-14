@@ -90,7 +90,7 @@ def find(str_jets,df):
     return n
     
     
-def composition_plot(df,df_str):
+def composition_plot(df,df_str,samples):
     x=np.array([])
     for var in samples:
         x=np.append(x,find(var,df))

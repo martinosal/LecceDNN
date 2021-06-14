@@ -107,25 +107,30 @@ for i in inputFiles:
         elif analysis == 'resolved':
             selection = 'Pass_Res_VBF_WZ_SR == True or Pass_Res_VBF_WZ_ZCR == True or Pass_Res_VBF_ZZ_SR == True or Pass_Res_VBF_ZZ_ZCR'
         newDf = newDf.query(selection)
-    newDf.insert(len(newDf.columns), 'mass', np.zeros(newDf.shape[0]), True)
+
+    print('done analysis')
+    if (dataType[counter] == 'bkg'):
+        newDf.insert(len(newDf.columns), 'isSignal', np.zeros(newDf.shape[0]), True)
+        newDf.insert(len(newDf.columns), 'mass', np.random.choice(mass,newDf.shape[0]), True)
+
     if (dataType[counter] == 'sig'):
         newDf.insert(len(newDf.columns), 'isSignal', np.ones(newDf.shape[0]), True)
-        for k in range(newDf.shape[0]):
-            found = False
-            for j in range(len(DSID)):
-                if (newDf.iat[k, 0] == int(DSID[j])): ###Vorrei rendere questo indipendente dalla posizione della colonna, ho letto che posso farlo con newDf.at[k,'DSID'] però il codice diventa molto più lento, hai un'altra soluzione? 
-                    newDf.iat[k, newDf.shape[1] - 2] = int(mass[j])
-                    found = True
-            if (found == False):
-                print(format(Fore.RED + 'WARNING !!! missing mass value for DSID ' + str(newDf.iat[k,0]))) ###Succede per tutti i segnali (o quasi)tranne il primo 
-        print(newDf[0:5])
-    else:
-        newDf.insert(len(newDf.columns), 'isSignal', np.zeros(newDf.shape[0]), True)
-        ### Assigning to background events a random signal mass
-        for event in range(newDf.shape[0]):
-            randomMass = random.choice(mass)
-            newDf.iat[event, newDf.shape[1] - 2] = int(randomMass)
-        print(newDf[0:5])
+
+        k=0
+        print('searching for', newDf.iat[k,0],'DSID')
+        found = False
+        for j in range(len(DSID)):
+            if (newDf.iat[k, 0] == int(DSID[j])): ###Vorrei rendere questo indipendente dalla posizione della colonna, ho letto che posso farlo con newDf.at[k,'DSID'] però il codice diventa molto più lento, hai un'altra soluzione? 
+                found = True
+                print('found mass:',int(mass[j]))
+                newDf.insert(len(newDf.columns), 'mass', np.array([int(mass[j]) for l in range(newDf.shape[0])]), True)
+                continue
+
+        if (found == False):
+            newDf.insert(len(newDf.columns), 'mass', np.zeros(newDf.shape[0]), True)
+            print(format(Fore.RED + 'WARNING !!! missing mass value for DSID ' + str(newDf.iat[k,0]))) ###Succede per tutti i segnali (o quasi)tranne il primo 
+    
+    print(newDf[0:5])
     df.append(newDf)
     counter+=1
 
@@ -136,18 +141,23 @@ for i in range(len(df)):
 ### Shuffling data
 #df_pd = ShufflingData(df_pd)
 
-logFile.write('\nNumber of events: ' + str(df_pd.shape[0]))                                                                                  
+logFile.write('\nNumber of events: ' + str(df_pd.shape[0]))
+
+print('Number of events:',str(df_pd.shape[0]))
 print('Saved ' + logFileName)
 logFile.close()
 
 ### Saving pkl files
-df_pd.to_pickle(dfPath + 'MixData_PD_' + analysis + '_' + channel + '.pkl')
-print('Saved to ' + dfPath + 'MixData_PD_' + analysis + '_' + channel + '.pkl')
+#df_pd.to_pickle(dfPath + 'MixData_PD_' + analysis + '_' + channel + '.pkl')
+import pickle
+with open(dfPath + 'MixData_PD_' + analysis + '_' + channel + '_p4.pkl', 'wb') as output_file:
+    pickle.dump(df_pd, output_file, protocol=4)
+print('Saved to ' + dfPath + 'MixData_PD_' + analysis + '_' + channel + '_p4.pkl')
 
-cut=[var+str('!=-99 and') for var in dataVariables ]
-flatten_cut=' '.join(cut)
-flatten_cut=flatten_cut[:(len(flatten_cut)-4)]
+#cut=[var+str('!=-99 and') for var in dataVariables ]
+#flatten_cut=' '.join(cut)
+#flatten_cut=flatten_cut[:(len(flatten_cut)-4)]
 
-df_pd_cut=df_pd.query(flatten_cut)
+#df_pd_cut=df_pd.query(flatten_cut)
 
-df_pd_cut.to_pickle(dfPath + 'MixData_PD_' + analysis + '_' + channel + 'cut.pkl')
+#df_pd_cut.to_pickle(dfPath + 'MixData_PD_' + analysis + '_' + channel + 'cut.pkl')

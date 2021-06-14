@@ -111,5 +111,5 @@ print('Saved ' + logFileName)
 logFile.close()
 
 ### Saving pkl files
-df_pd.to_pickle(dfPath + 'MixData_PD_' + analysis + '_' + channel + '.pkl')
+df_pd.to_pickle(dfPath + 'MixData_PD_' + analysis + '_' + channel + '_p4.pkl',protocol=4)
 print('Saved to ' + dfPath + 'MixData_PD_' + analysis + '_' + channel + '.pkl')
