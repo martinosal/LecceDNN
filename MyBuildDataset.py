@@ -10,7 +10,6 @@ from colorama import init, Fore
 init(autoreset = True)
 
 
-'''
 parser = argparse.ArgumentParser(description = 'Deep Neural Network Training and testing Framework')
 parser.add_argument('-p', '--Preselection', default = '', help = 'String which will be translated to python command to filter the initial PDs according to it. E.g. \'lep1_pt > 0 and lep1_eta > 0\'', type = str)
 parser.add_argument('-a', '--Analysis', help = 'Type of analysis: \'merged\' or \'resolved\'', type = str)
@@ -28,11 +27,6 @@ if args.Channel is None:
 elif args.Channel != 'ggF' and args.Channel != 'VBF':
     parser.error('Channel can be either \'ggF\' or \'VBF\'')
 PreselectionCuts = args.Preselection
-'''
-
-analysis='resolved'
-channel='ggF'
-PreselectionCuts=''
 
 
 ### Reading from config file
@@ -57,7 +51,7 @@ mass = [int(i.split(':')[1]) for i in lines]
 ### Loading pkl files, selecting only relevant variables, creating sig/bkg flag, converting DSID into mass
 df = []
 counter = 0
-logFileName = dfPath + 'buildDataSetLogFile_' + analysis + '_' + channel + '.txt'
+logFileName = dfPath + 'buildDataSetLogFile_' + analysis + '_' + channel + '_p4.txt'
 logFile = open(logFileName, 'w')
 logFile.write('Analysis: ' + analysis + '\nChannel: ' + channel + '\nPreselection cuts: ' + PreselectionCuts + '\nInput files path: ' + dfPath + '\nrootBranchSubSamples: ' + str(rootBranchSubSample) + '\nInput files: [')
 
@@ -132,7 +126,7 @@ for i in inputFiles:
             if found==False:
                 print('mass related to',x,'not found')
                 #masses=np.append(masses,0)
-                masses[np.where(newDf['DSID']==x)]=0
+                #masses[np.where(newDf['DSID']==x)]=0
 
         print('found masses:',set(masses))
         newDf.insert(len(newDf.columns), 'mass', masses, True)

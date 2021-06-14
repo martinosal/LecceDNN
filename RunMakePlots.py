@@ -30,11 +30,26 @@ def plot_var(list_var,samples,var_str,plt_str,path,directory):
     plt.close(fig)
 #    plt.show()
     
-
-analysis='resolved'
-channel='ggF'
-PreselectionCuts=''
 samples=['Zjets','Wjets','stop','Diboson','ttbar','Radion','VBFRSG','RSG','VBFRadion','VBFHVTWZ']
+parser = argparse.ArgumentParser(description = 'Deep Neural Network Training and testing Framework')
+parser.add_argument('-p', '--Preselection', default = '', help = 'String which will be translated to python command to filter the initial PDs according to it. E.g. \'lep1_pt > 0 and lep1_eta > 0\'', type = str)
+parser.add_argument('-a', '--Analysis', help = 'Type of analysis: \'merged\' or \'resolved\'', type = str)
+parser.add_argument('-c', '--Channel', help = 'Channel: \'ggF\' or \'VBF\'')
+args = parser.parse_args()
+
+analysis = args.Analysis
+if args.Analysis is None:
+    parser.error('Requested type of analysis (either \'mergered\' or \'resolved\')')
+elif args.Analysis != 'resolved' and args.Analysis != 'merged':
+    parser.error('Analysis can be either \'merged\' or \'resolved\'')
+channel = args.Channel
+if args.Channel is None:
+    parser.error('Requested channel (either \'ggF\' or \'VBF\')')
+elif args.Channel != 'ggF' and args.Channel != 'VBF':
+    parser.error('Channel can be either \'ggF\' or \'VBF\'')
+PreselectionCuts = args.Preselection
+
+
 
 ### Reading from config file
 config = configparser.ConfigParser()
@@ -51,7 +66,7 @@ dataVariables=ast.literal_eval(config.get('config', 'InputFeaturesResolved'))
 
 
 path='./plots/'
-directory=analysis+'_'+channel+''+PreselectionCuts
+directory=analysis+'_'+channel+''+PreselectionCuts+'_p4'
 mkplots.check_dir(path,directory)
 
 
