@@ -35,6 +35,12 @@ config.read('MyConfig.txt')
 inputFiles = ast.literal_eval(config.get('config', 'inputFiles'))
 dataType = ast.literal_eval(config.get('config', 'dataType'))
 rootBranchSubSample = ast.literal_eval(config.get('config', 'rootBranchSubSample'))
+
+if analysis == 'merged':
+    InputFeatures = ast.literal_eval(config.get('config', 'InputFeaturesMerged'))
+elif analysis == 'resolved':
+    InputFeatures = ast.literal_eval(config.get('config', 'InputFeaturesResolved'))
+
 dfPath = config.get('config', 'dfPath')
 print (format('Output directory: ' + Fore.GREEN + dfPath), checkCreateDir(dfPath))
 
@@ -51,7 +57,7 @@ mass = [int(i.split(':')[1]) for i in lines]
 ### Loading pkl files, selecting only relevant variables, creating sig/bkg flag, converting DSID into mass
 df = []
 counter = 0
-logFileName = dfPath + 'buildDataSetLogFile_' + analysis + '_' + channel + '_p4.txt'
+logFileName = dfPath + 'buildDataSetLogFile_' + analysis + '_' + channel +  '_' +PreselectionCuts + '_p4.txt'
 logFile = open(logFileName, 'w')
 logFile.write('Analysis: ' + analysis + '\nChannel: ' + channel + '\nPreselection cuts: ' + PreselectionCuts + '\nInput files path: ' + dfPath + '\nrootBranchSubSamples: ' + str(rootBranchSubSample) + '\nInput files: [')
 
@@ -149,11 +155,11 @@ print('Saved ' + logFileName)
 logFile.close()
 
 ### Saving pkl files
-#df_pd.to_pickle(dfPath + 'MixData_PD_' + analysis + '_' + channel + '.pkl')
-import pickle
-with open(dfPath + 'MixData_PD_' + analysis + '_' + channel + '_p4.pkl', 'wb') as output_file:
-    pickle.dump(df_pd, output_file, protocol=4)
-print('Saved to ' + dfPath + 'MixData_PD_' + analysis + '_' + channel + '_p4.pkl')
+df_pd.to_pickle(dfPath + 'MixData_PD_' + analysis + '_' + channel + '_' + PreselectionCuts+'_p4.pkl')
+#import pickle
+#with open(dfPath + 'MixData_PD_' + analysis + '_' + channel + '_' +PreselectionCuts +'_p4.pkl', 'wb') as output_file:
+#    pickle.dump(df_pd, output_file, protocol=4)
+print('Saved to ' + dfPath + 'MixData_PD_' + analysis + '_' + channel + '_' +PreselectionCuts + '_p4.pkl')
 
 #cut=[var+str('!=-99 and') for var in dataVariables ]
 #flatten_cut=' '.join(cut)
