@@ -66,12 +66,14 @@ dataVariables=ast.literal_eval(config.get('config', 'InputFeaturesResolved'))
 
 
 path='./plots/'
-directory=analysis+'_'+channel+''+PreselectionCuts+'_p4'
+directory=analysis+'_'+channel+'_p4'
 mkplots.check_dir(path,directory)
 
 
-mixed_data=pd.read_pickle(dfPath+'MixData_PD_'+analysis+'_'+channel+'_p4.pkl')
-pd_name='MixData_PD_'+analysis+'_'+channel+'_p4'
+mixed_data=pd.read_pickle(dfPath+'MixData_PD_'+analysis+'_'+channel+'_'+PreselectionCuts+'_p4.pkl')
+pd_name='MixData_PD_'+analysis+'_'+channel+'_'+PreselectionCuts+'_p4'
+
+composition=mkplots.composition_plot(mixed_data,samples,pd_name,path,directory)    
 
 print(dataVariables)
 

@@ -79,7 +79,8 @@ def plot_var(list_var,samples,var_str,plt_str,path,directory):
     plt.xlabel(var_str)
     plt.legend()
     plt.savefig(path+directory+'/'+var_str+'_'+plt_str+'.pdf')
-    plt.show()
+#    plt.show()
+    plt.close(fig)
     
     
 def find(str_jets,df):
@@ -90,15 +91,16 @@ def find(str_jets,df):
     return n
     
     
-def composition_plot(df,df_str,samples):
+def composition_plot(df,samples,plt_str,path,directory):
     x=np.array([])
     for var in samples:
         x=np.append(x,find(var,df))
 
-    plt.figure(1,figsize=(18,6))
+    fig=plt.figure(1,figsize=(18,6))
     plt.bar(samples,x)
     #plt.text(3, 80, analysis+' '+channel , fontsize=12,horizontalalignment='center',verticalalignment='center')
-    plt.suptitle(analysis+' '+channel+' composition')
+    plt.suptitle(plt_str+' composition')
     plt.yscale('log')
-    plt.savefig(path+directory+'/'+analysis+'_'+channel+'_'+df_str+'_composition.pdf')
-    plt.show()
+    plt.savefig(path+directory+'/'+'composition_'+plt_str+'.pdf')
+#    plt.show()
+    plt.close(fig)
